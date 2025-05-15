@@ -170,7 +170,12 @@
           const metadataUrl = uri.replace("ipfs://", ipfsGateway);
           const res = await fetch(metadataUrl);
           const data = await res.json();
-          const imgUrl = data.image.replace("ipfs://", ipfsGateway); // CORREGIDO
+
+          // Aquí corregimos la carga de la imagen
+          let imgUrl = data.image;
+          if (imgUrl.startsWith("ipfs://")) {
+            imgUrl = imgUrl.replace("ipfs://", ipfsGateway);
+          }
 
           const card = document.createElement("div");
           card.className = "card";
