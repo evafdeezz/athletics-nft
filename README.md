@@ -19,5 +19,6 @@ Red: **Sepolia**
 2. Ve al [portal de Azure](https://portal.azure.com)
 3. Crea una **Static Web App** vinculada a este repo
 4. Configura ruta base `/` y sin output directory
+5. Terminamos
 
 ---
