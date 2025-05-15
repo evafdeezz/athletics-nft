@@ -75,13 +75,13 @@
 <body>
 
   <header>
-    <h1>⚽ NFT Atletismo - Inscripción y Clasificación</h1>
+    <h1>🏀 NFT Atletismo - Inscripción y Clasificación</h1>
     <p>Interactúa con tu contrato inteligente y registra tu participación</p>
   </header>
 
   <section class="section">
     <h2>🔗 Conexión</h2>
-    <p><strong>Dirección del contrato:</strong> <span id="contractAddress">0x55e0C535CebFa0478e7E4CE92a3c053F5FA2005e</span></p>
+    <p><strong>Dirección del contrato:</strong> <span id="contractAddress">0x97D996ED9dE8d5f0821f4b2d18a236D7C20C7002</span></p>
     <p><strong>Tu wallet:</strong> <span id="walletAddress">(no conectado)</span></p>
     <button onclick="connectWallet()">Conectar Wallet</button>
   </section>
@@ -94,14 +94,15 @@
   </section>
 
   <section class="section">
-    <h2>🎖️ Tus NFTs</h2>
+    <h2>🏅 Tus NFTs</h2>
     <div id="tokensContainer"></div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
   <script>
-    const contractAddress = "0x55e0C535CebFa0478e7E4CE92a3c053F5FA2005e";
+    const contractAddress = "0x55e0C535CebFa0478e7E4CE92a3c053F5FA2005e"; // TU CONTRATO
     const ipfsGateway = "https://gateway.pinata.cloud/ipfs/";
+    const ipfsBaseCID = "bafybeidn42k7ftrwtficczrobzm2kui5scvqmw44lj3ulb64jq4lmn6eeu"; // carpeta de los JSON
 
     const abi = [
       {
@@ -166,8 +167,7 @@
       for (let id = 1; id <= 4; id++) {
         const balance = await contract.methods.balanceOf(userAddress, id).call();
         if (balance > 0) {
-          const uri = await contract.methods.uri(id).call();
-          const metadataUrl = uri.replace("ipfs://", ipfsGateway);
+          const metadataUrl = `${ipfsGateway}${ipfsBaseCID}/${id}.json`;
           const res = await fetch(metadataUrl);
           const data = await res.json();
           const imgUrl = data.image.replace("ipfs://", ipfsGateway);
