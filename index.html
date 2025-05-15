@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inscripción Atletismo NFT</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0; padding: 0;
+      background: linear-gradient(to right, #f8f9fa, #e0f7fa);
+      color: #333;
+    }
+    header {
+      background: #00796b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      padding: 30px;
+      max-width: 800px;
+      margin: auto;
+    }
+    .section {
+      margin-bottom: 40px;
+    }
+    label, input, button {
+      display: block;
+      width: 100%;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #00796b;
+      color: white;
+      border: none;
+      padding: 12px;
+      margin-top: 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #004d40;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #00695c;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>⚽ NFT Atletismo - Inscripción y Clasificación</h1>
+    <p>Interactúa con tu contrato inteligente y registra tu participación</p>
+  </header>
+
+  <main>
+    <div class="section">
+      <h2>🔗 Conexión</h2>
+      <p><strong>Dirección del contrato:</strong> <span id="contractAddress">0xTU_DIRECCION_CONTRATO</span></p>
+      <p><strong>Tu wallet:</strong> <span id="userAddress">(no conectado)</span></p>
+      <button onclick="connectWallet()">Conectar Wallet</button>
+    </div>
+
+    <div class="section">
+      <h2>🏃️ Inscribirse a una competición</h2>
+      <label for="mintTo">Dirección destino (wallet del atleta)</label>
+      <input id="mintTo" type="text" placeholder="Ej: 0x1234...">
+
+      <label for="tokenId">ID de la competición (1 a 4)</label>
+      <input id="tokenId" type="number" placeholder="Ej: 1">
+
+      <button onclick="mintNFT()">Inscribirse (mintEntry)</button>
+      <p class="status" id="mintStatus"></p>
+    </div>
+  </main>
+
+  <script>
+    const contractAddress = "0x55e0C535CebFa0478e7E4CE92a3c053F5FA2005e";
+    const abi = [
+      "function mintEntry(address to, uint256 id) public",
+      "function getCompetition(uint256 id) public view returns (string memory name, string memory metadataURI)"
+    ];
+
+    document.getElementById("contractAddress").innerText = contractAddress;
+    let signer;
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        await ethereum.request({ method: 'eth_requestAccounts' });
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
+        const userAddr = await signer.getAddress();
+        document.getElementById("userAddress").innerText = userAddr;
+        alert("Wallet conectada: " + userAddr);
+      } else {
+        alert("Instala MetaMask para continuar.");
+      }
+    }
+
+    async function mintNFT() {
+      const to = document.getElementById("mintTo").value;
+      const id = parseInt(document.getElementById("tokenId").value);
+
+      if (!signer) return alert("Conecta tu wallet primero.");
+      if (!ethers.isAddress(to)) return alert("Dirección inválida.");
+      if (isNaN(id)) return alert("ID inválido.");
+
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      try {
+        document.getElementById("mintStatus").innerText = "Enviando transacción...";
+        const tx = await contract.mintEntry(to, id);
+        await tx.wait();
+        document.getElementById("mintStatus").innerText = "✅ ¡Token mintado correctamente! Tx: " + tx.hash;
+      } catch (error) {
+        console.error(error);
+        document.getElementById("mintStatus").innerText = "❌ Error en la transacción.";
+      }
+    }
+  </script>
+</body>
+</html>
