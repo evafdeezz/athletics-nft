@@ -16,7 +16,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: atletismo-azfuhsa7fcgcfgft   # Pon el nombre exacto de tu Web App
+          app-name: blockchain-atletismo
           slot-name: production
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
