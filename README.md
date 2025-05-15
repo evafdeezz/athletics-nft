@@ -11,7 +11,7 @@ Aplicación web para inscribirse en competiciones de atletismo mediante NFTs en 
 ## Contrato desplegado
 
 Dirección del contrato: `0x55e0C535CebFa0478e7E4CE92a3c053F5FA2005e`  
-Red: **Sepolia**
+Red: **Sepolia** 
 
 ## Despliegue como Static Web App
 
