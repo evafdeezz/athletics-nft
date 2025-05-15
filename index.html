@@ -1,130 +1,190 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Inscripción Atletismo NFT</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NFT Atletismo - Inscripción</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter&display=swap">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0; padding: 0;
-      background: linear-gradient(to right, #f8f9fa, #e0f7fa);
-      color: #333;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #e6f7f7;
+      color: #222;
     }
     header {
-      background: #00796b;
+      background-color: #006d5b;
       color: white;
-      padding: 20px;
+      padding: 1.5rem;
       text-align: center;
     }
-    main {
-      padding: 30px;
-      max-width: 800px;
-      margin: auto;
+    h1 {
+      margin: 0.2rem;
     }
     .section {
-      margin-bottom: 40px;
+      padding: 2rem;
+      background-color: white;
+      margin: 1rem auto;
+      max-width: 800px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-    label, input, button {
+    input, button {
       display: block;
+      margin: 1rem 0;
+      padding: 0.8rem;
       width: 100%;
-      font-size: 16px;
-      margin-top: 10px;
-    }
-    input {
-      padding: 10px;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      font-size: 1rem;
     }
     button {
-      background-color: #00796b;
+      background-color: #00795f;
       color: white;
-      border: none;
-      padding: 12px;
-      margin-top: 20px;
-      border-radius: 5px;
+      font-weight: bold;
       cursor: pointer;
+      border: none;
     }
     button:hover {
-      background-color: #004d40;
+      background-color: #005c47;
     }
-    .status {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #00695c;
+    #tokensContainer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 1rem;
+      width: 200px;
+      background-color: #fafafa;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
+    .card img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .card h3 {
+      margin: 0.5rem 0 0.2rem;
+      font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
+
   <header>
     <h1>⚽ NFT Atletismo - Inscripción y Clasificación</h1>
     <p>Interactúa con tu contrato inteligente y registra tu participación</p>
   </header>
 
-  <main>
-    <div class="section">
-      <h2>🔗 Conexión</h2>
-      <p><strong>Dirección del contrato:</strong> <span id="contractAddress">0xTU_DIRECCION_CONTRATO</span></p>
-      <p><strong>Tu wallet:</strong> <span id="userAddress">(no conectado)</span></p>
-      <button onclick="connectWallet()">Conectar Wallet</button>
-    </div>
+  <section class="section">
+    <h2>🔗 Conexión</h2>
+    <p><strong>Dirección del contrato:</strong> <span id="contractAddress">0x55e0C535CebFa0478e7E4CE92a3c053F5FA2005e</span></p>
+    <p><strong>Tu wallet:</strong> <span id="walletAddress">(no conectado)</span></p>
+    <button onclick="connectWallet()">Conectar Wallet</button>
+  </section>
 
-    <div class="section">
-      <h2>🏃️ Inscribirse a una competición</h2>
-      <label for="mintTo">Dirección destino (wallet del atleta)</label>
-      <input id="mintTo" type="text" placeholder="Ej: 0x1234...">
+  <section class="section">
+    <h2>🏃 Inscribirse a una competición</h2>
+    <input type="text" id="addressInput" placeholder="Dirección del atleta (0x...)" />
+    <input type="number" id="idInput" placeholder="ID de la competición (1-4)" min="1" max="4"/>
+    <button onclick="mintEntry()">Inscribirse (mintEntry)</button>
+  </section>
 
-      <label for="tokenId">ID de la competición (1 a 4)</label>
-      <input id="tokenId" type="number" placeholder="Ej: 1">
+  <section class="section">
+    <h2>🎖️ Tus NFTs</h2>
+    <div id="tokensContainer"></div>
+  </section>
 
-      <button onclick="mintNFT()">Inscribirse (mintEntry)</button>
-      <p class="status" id="mintStatus"></p>
-    </div>
-  </main>
-
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
   <script>
     const contractAddress = "0x55e0C535CebFa0478e7E4CE92a3c053F5FA2005e";
+    const ipfsGateway = "https://gateway.pinata.cloud/ipfs/";
+
     const abi = [
-      "function mintEntry(address to, uint256 id) public",
-      "function getCompetition(uint256 id) public view returns (string memory name, string memory metadataURI)"
+      {
+        "inputs": [
+          {"internalType": "address", "name": "account", "type": "address"},
+          {"internalType": "uint256", "name": "id", "type": "uint256"}
+        ],
+        "name": "balanceOf",
+        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [{"internalType": "uint256", "name": "id", "type": "uint256"}],
+        "name": "uri",
+        "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {"internalType": "address", "name": "to", "type": "address"},
+          {"internalType": "uint256", "name": "id", "type": "uint256"}
+        ],
+        "name": "mintEntry",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
     ];
 
-    document.getElementById("contractAddress").innerText = contractAddress;
-    let signer;
+    let web3;
+    let userAddress;
+    let contract;
 
     async function connectWallet() {
       if (window.ethereum) {
-        await ethereum.request({ method: 'eth_requestAccounts' });
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        signer = await provider.getSigner();
-        const userAddr = await signer.getAddress();
-        document.getElementById("userAddress").innerText = userAddr;
-        alert("Wallet conectada: " + userAddr);
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const accounts = await web3.eth.getAccounts();
+        userAddress = accounts[0];
+        document.getElementById("walletAddress").innerText = userAddress;
+        contract = new web3.eth.Contract(abi, contractAddress);
+        loadUserTokens();
       } else {
-        alert("Instala MetaMask para continuar.");
+        alert("Por favor instala MetaMask.");
       }
     }
 
-    async function mintNFT() {
-      const to = document.getElementById("mintTo").value;
-      const id = parseInt(document.getElementById("tokenId").value);
+    async function mintEntry() {
+      const address = document.getElementById("addressInput").value;
+      const id = parseInt(document.getElementById("idInput").value);
+      if (!address || !id) return alert("Rellena todos los campos.");
+      await contract.methods.mintEntry(address, id).send({ from: userAddress });
+      alert("¡Inscripción realizada!");
+      loadUserTokens();
+    }
 
-      if (!signer) return alert("Conecta tu wallet primero.");
-      if (!ethers.isAddress(to)) return alert("Dirección inválida.");
-      if (isNaN(id)) return alert("ID inválido.");
+    async function loadUserTokens() {
+      const container = document.getElementById("tokensContainer");
+      container.innerHTML = "";
+      for (let id = 1; id <= 4; id++) {
+        const balance = await contract.methods.balanceOf(userAddress, id).call();
+        if (balance > 0) {
+          const uri = await contract.methods.uri(id).call();
+          const metadataUrl = uri.replace("ipfs://", ipfsGateway);
+          const res = await fetch(metadataUrl);
+          const data = await res.json();
+          const imgUrl = data.image.replace("ipfs://", ipfsGateway);
 
-      const contract = new ethers.Contract(contractAddress, abi, signer);
-
-      try {
-        document.getElementById("mintStatus").innerText = "Enviando transacción...";
-        const tx = await contract.mintEntry(to, id);
-        await tx.wait();
-        document.getElementById("mintStatus").innerText = "✅ ¡Token mintado correctamente! Tx: " + tx.hash;
-      } catch (error) {
-        console.error(error);
-        document.getElementById("mintStatus").innerText = "❌ Error en la transacción.";
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img src="${imgUrl}" alt="${data.name}" />
+            <h3>${data.name}</h3>
+            <p>${data.description}</p>
+            <p><strong>Cantidad:</strong> ${balance}</p>
+          `;
+          container.appendChild(card);
+        }
       }
     }
   </script>
+
 </body>
 </html>
