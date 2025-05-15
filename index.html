@@ -170,7 +170,7 @@
           const metadataUrl = uri.replace("ipfs://", ipfsGateway);
           const res = await fetch(metadataUrl);
           const data = await res.json();
-          const imgUrl = data.image; // ya es URL HTTP
+          const imgUrl = data.image.replace("ipfs://", ipfsGateway); // CORREGIDO
 
           const card = document.createElement("div");
           card.className = "card";
