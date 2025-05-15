@@ -29,7 +29,7 @@
       border-radius: 12px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-    input, button {
+    input, button, select {
       display: block;
       margin: 1rem 0;
       padding: 0.8rem;
@@ -87,14 +87,14 @@
   </section>
 
   <section class="section">
-    <h2>🏃 Inscribirse a una competición</h2>
-    <input type="text" id="addressInput" placeholder="Dirección del atleta (0x...)" />
-    <input type="number" id="idInput" placeholder="ID de la competición (1-4)" min="1" max="4"/>
-    <button onclick="mintEntry()">Inscribirse (mintEntry)</button>
+    <h2>🏃 Inscribirse</h2>
+    <input id="addressInput" placeholder="Dirección del atleta (0x...)" />
+    <input id="idInput" type="number" placeholder="ID de la competición (1-4)" min="1" max="4" />
+    <button onclick="mintEntry()">Inscribirse</button>
   </section>
 
   <section class="section">
-    <h2>🎖️ Tus NFTs</h2>
+    <h2>🏆 Tus NFTs</h2>
     <div id="tokensContainer"></div>
   </section>
 
@@ -110,7 +110,9 @@
           {"internalType": "uint256", "name": "id", "type": "uint256"}
         ],
         "name": "balanceOf",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "outputs": [
+          {"internalType": "uint256", "name": "", "type": "uint256"}
+        ],
         "stateMutability": "view",
         "type": "function"
       },
@@ -140,23 +142,23 @@
     async function connectWallet() {
       if (window.ethereum) {
         web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
+        await ethereum.request({ method: 'eth_requestAccounts' });
         const accounts = await web3.eth.getAccounts();
         userAddress = accounts[0];
         document.getElementById("walletAddress").innerText = userAddress;
         contract = new web3.eth.Contract(abi, contractAddress);
         loadUserTokens();
       } else {
-        alert("Por favor instala MetaMask.");
+        alert("Por favor, instala MetaMask.");
       }
     }
 
     async function mintEntry() {
       const address = document.getElementById("addressInput").value;
       const id = parseInt(document.getElementById("idInput").value);
-      if (!address || !id) return alert("Rellena todos los campos.");
+      if (!address || !id) return alert("Completa todos los campos");
       await contract.methods.mintEntry(address, id).send({ from: userAddress });
-      alert("¡Inscripción realizada!");
+      alert("NFT emitido con éxito.");
       loadUserTokens();
     }
 
@@ -166,29 +168,24 @@
       for (let id = 1; id <= 4; id++) {
         const balance = await contract.methods.balanceOf(userAddress, id).call();
         if (balance > 0) {
-          const uri = await contract.methods.uri(id).call();
-          const metadataUrl = uri.replace("ipfs://", ipfsGateway);
-          const res = await fetch(metadataUrl);
-          const data = await res.json();
-
-          // Aquí corregimos la carga de la imagen
-          let imgUrl = data.image;
-          if (imgUrl.startsWith("ipfs://")) {
-            imgUrl = imgUrl.replace("ipfs://", ipfsGateway);
+          let uri = await contract.methods.uri(id).call();
+          uri = uri.replace("ipfs://", ipfsGateway);
+          const metadata = await fetch(uri).then(res => res.json());
+          let image = metadata.image;
+          if (image.startsWith("ipfs://")) {
+            image = image.replace("ipfs://", ipfsGateway);
           }
-
           const card = document.createElement("div");
           card.className = "card";
           card.innerHTML = `
-            <img src="${imgUrl}" alt="${data.name}" />
-            <h3>${data.name}</h3>
-            <p>${data.description}</p>
+            <img src="${image}" alt="${metadata.name}" />
+            <h3>${metadata.name}</h3>
+            <p>${metadata.description}</p>
             <p><strong>Cantidad:</strong> ${balance}</p>
           `;
           container.appendChild(card);
         }
       }
-
       if (container.innerHTML === "") {
         container.innerHTML = "<p>No tienes NFTs aún.</p>";
       }
