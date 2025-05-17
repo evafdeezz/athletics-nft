@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NFT Atletismo - Inscripción</title>
+  <title>Copa de Naciones - Inscripciones</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter&display=swap">
   <style>
     body {
@@ -15,7 +15,7 @@
     header {
       background-color: #006d5b;
       color: white;
-      padding: 1.5rem;
+      padding: 2rem;
       text-align: center;
     }
     h1 {
@@ -25,11 +25,11 @@
       padding: 2rem;
       background-color: white;
       margin: 1rem auto;
-      max-width: 800px;
+      max-width: 900px;
       border-radius: 12px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
-    input, button {
+    select, input, button {
       display: block;
       margin: 1rem 0;
       padding: 0.8rem;
@@ -45,20 +45,22 @@
       cursor: pointer;
       border: none;
     }
-    button:hover {
+    button:hover:not(:disabled) {
       background-color: #005c47;
     }
-    #tokensContainer {
-      display: flex;
-      flex-wrap: wrap;
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 1rem;
-      justify-content: center;
     }
     .card {
       border: 1px solid #ddd;
       border-radius: 10px;
       padding: 1rem;
-      width: 200px;
       background-color: #fafafa;
       box-shadow: 0 0 5px rgba(0,0,0,0.05);
     }
@@ -73,125 +75,154 @@
   </style>
 </head>
 <body>
-
   <header>
-    <h1>🏅 NFT Atletismo - Inscripción y Clasificación</h1>
-    <p>Interactúa con tu contrato inteligente y registra tu participación</p>
+    <h1>Copa de Naciones - 27 de junio 2024</h1>
+    <p>Inscripciones oficiales en pruebas de atletismo mediante NFTs</p>
   </header>
 
   <section class="section">
-    <h2>🔗 Conexión</h2>
-    <p><strong>Dirección del contrato:</strong> <span id="contractAddress">0x9459301CC184e6DDB6f14002c36e723a2B528EFD</span></p>
-    <p><strong>Tu wallet:</strong> <span id="walletAddress">(no conectado)</span></p>
-    <button onclick="connectWallet()">Conectar Wallet</button>
+    <h2>1. Conecta tu Wallet</h2>
+    <p><strong>Dirección:</strong> <span id="wallet">(no conectado)</span></p>
+    <button onclick="connectWallet()">Conectar con MetaMask</button>
   </section>
 
   <section class="section">
-    <h2>🏃 Inscribirse</h2>
-    <input type="text" id="addressInput" placeholder="Dirección del atleta (0x...)" />
-    <input type="number" id="idInput" placeholder="ID de la competición (1-4)" min="1" max="4" />
-    <button onclick="mintEntry()">Inscribirse</button>
+    <h2>2. Selecciona tu perfil</h2>
+    <select id="sexo">
+      <option value="0">Masculino</option>
+      <option value="1">Femenino</option>
+    </select>
+    <input type="number" id="edad" placeholder="Edad (mínimo 16 años)" min="16" />
+    <button onclick="mostrarCompeticiones()">Mostrar competiciones disponibles</button>
   </section>
 
   <section class="section">
-    <h2>🏆 Tus NFTs</h2>
-    <div id="tokensContainer"></div>
+    <h2>3. Competiciones disponibles</h2>
+    <div id="competiciones" class="card-grid"></div>
+  </section>
+
+  <section class="section">
+    <h2>Inscripciones NFT en la Copa de Naciones</h2>
+    <div id="nfts" class="card-grid"></div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
   <script>
-    const contractAddress = "0x9459301CC184e6DDB6f14002c36e723a2B528EFD";
+    const contractAddress = "0xc43D21A9c3cC6c54f6dE0e38e492D06F54BBF0Fb";
     const ipfsGateway = "https://gateway.pinata.cloud/ipfs/";
-    const ipfsFolderCID = "bafybeibtj45bplxpg4cy4sucy3vusaotk53fcf6xnlr3rffefx53nkqvjm"; // Asegúrate de que este es el correcto
+    const ipfsCID = "bafybeiciumeoqtlkkhnujm75aecoerwxashsdgkp6aug234dyd4753d6ie";
 
     const abi = [
-      {
-        "inputs": [
-          {"internalType": "address", "name": "account", "type": "address"},
-          {"internalType": "uint256", "name": "id", "type": "uint256"}
-        ],
-        "name": "balanceOf",
-        "outputs": [
-          {"internalType": "uint256", "name": "", "type": "uint256"}
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {"internalType": "uint256", "name": "id", "type": "uint256"}
-        ],
-        "name": "uri",
-        "outputs": [
-          {"internalType": "string", "name": "", "type": "string"}
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {"internalType": "address", "name": "to", "type": "address"},
-          {"internalType": "uint256", "name": "id", "type": "uint256"}
-        ],
-        "name": "mintEntry",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      }
+      {"inputs": [{"internalType": "address", "name": "to", "type": "address"}, {"internalType": "uint256", "name": "id", "type": "uint256"}], "name": "mintEntry", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
+      {"inputs": [{"internalType": "address", "name": "account", "type": "address"}, {"internalType": "uint256", "name": "id", "type": "uint256"}], "name": "balanceOf", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
+      {"inputs": [{"internalType": "uint256", "name": "id", "type": "uint256"}], "name": "uri", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"}
+    ];
+
+    const pruebas = [
+      { id: 10400, nombre: "100m Masculino Absoluto" },
+      { id: 10100, nombre: "Altura Masculino Sub18" },
+      { id: 20200, nombre: "Longitud Masculino Sub20" },
+      { id: 40300, nombre: "Martillo Masculino Sub23" },
+      { id: 50400, nombre: "Relevos Masculino Absoluto" },
+      { id: 60300, nombre: "Vallas Masculino Sub23" },
+      { id: 20701, nombre: "Altura Femenino Sub20" },
+      { id: 10801, nombre: "Disco Femenino Sub18" },
+      { id: 30901, nombre: "Jabalina Femenino Sub23" },
+      { id: 41001, nombre: "Marcha Femenino Absoluto" },
+      { id: 51101, nombre: "Obstáculos Femenino Absoluto" },
+      { id: 61201, nombre: "Triple Femenino Sub20" }
     ];
 
     let web3;
-    let userAddress;
     let contract;
+    let user;
 
     async function connectWallet() {
       if (window.ethereum) {
         web3 = new Web3(window.ethereum);
         await window.ethereum.request({ method: "eth_requestAccounts" });
         const accounts = await web3.eth.getAccounts();
-        userAddress = accounts[0];
-        document.getElementById("walletAddress").innerText = userAddress;
+        user = accounts[0];
+        document.getElementById("wallet").innerText = user;
         contract = new web3.eth.Contract(abi, contractAddress);
-        loadUserTokens();
+        mostrarTusNFTs();
       } else {
         alert("Por favor instala MetaMask.");
       }
     }
 
-    async function mintEntry() {
-      const address = document.getElementById("addressInput").value;
-      const id = parseInt(document.getElementById("idInput").value);
-      if (!address || !id) return alert("Rellena todos los campos.");
-      await contract.methods.mintEntry(address, id).send({ from: userAddress });
-      alert("¡Inscripción realizada!");
-      loadUserTokens();
+    function getCategoria(edad) {
+      if (edad < 16) return null;
+      if (edad < 18) return 1;
+      if (edad < 20) return 2;
+      if (edad < 23) return 3;
+      return 4;
     }
 
-    async function loadUserTokens() {
-      const container = document.getElementById("tokensContainer");
+    async function mostrarCompeticiones() {
+      const sexo = parseInt(document.getElementById("sexo").value);
+      const edad = parseInt(document.getElementById("edad").value);
+      const cat = getCategoria(edad);
+      if (!cat) return alert("Edad mínima: 16 años");
+
+      const container = document.getElementById("competiciones");
       container.innerHTML = "";
-      for (let id = 1; id <= 4; id++) {
-        const balance = await contract.methods.balanceOf(userAddress, id).call();
+
+      for (const prueba of pruebas) {
+        if (prueba.id % 10 !== sexo) continue;
+        const idCategoria = Math.floor((prueba.id % 10000) / 100);
+        if (cat > idCategoria) continue;
+
+        const balance = await contract.methods.balanceOf(user, prueba.id).call();
+        const inscrito = parseInt(balance) > 0;
+
+        const uri = `https://gateway.pinata.cloud/ipfs/${ipfsCID}/${prueba.id}.json`;
+        const res = await fetch(uri);
+        const meta = await res.json();
+        const imagen = meta.image.replace("ipfs://", ipfsGateway);
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="${imagen}" alt="${meta.name}" />
+          <h3>${meta.name}</h3>
+          <p>${meta.description}</p>
+          <button ${inscrito ? "disabled" : "onclick=\"inscribirse(" + prueba.id + ")\""}>
+            ${inscrito ? "Ya inscrito" : "Inscribirme"}
+          </button>
+        `;
+        container.appendChild(card);
+      }
+    }
+
+    async function inscribirse(id) {
+      await contract.methods.mintEntry(user, id).send({ from: user });
+      alert("¡Inscripción completada!");
+      mostrarCompeticiones();
+      mostrarTusNFTs();
+    }
+
+    async function mostrarTusNFTs() {
+      const container = document.getElementById("nfts");
+      container.innerHTML = "";
+      for (const prueba of pruebas) {
+        const balance = await contract.methods.balanceOf(user, prueba.id).call();
         if (parseInt(balance) > 0) {
-          const uri = await contract.methods.uri(id).call();
-          const metadataUrl = uri.replace("ipfs://", ipfsGateway);
-          const res = await fetch(metadataUrl);
-          const data = await res.json();
-          const imgUrl = data.image.startsWith("ipfs://") ? data.image.replace("ipfs://", ipfsGateway) : data.image;
+          const uri = `https://gateway.pinata.cloud/ipfs/${ipfsCID}/${prueba.id}.json`;
+          const res = await fetch(uri);
+          const meta = await res.json();
+          const imagen = meta.image.replace("ipfs://", ipfsGateway);
 
           const card = document.createElement("div");
           card.className = "card";
           card.innerHTML = `
-            <img src="${imgUrl}" alt="${data.name}" />
-            <h3>${data.name}</h3>
-            <p>${data.description}</p>
+            <img src="${imagen}" alt="${meta.name}" />
+            <h3>${meta.name}</h3>
+            <p>${meta.description}</p>
             <p><strong>Cantidad:</strong> ${balance}</p>
           `;
           container.appendChild(card);
         }
-      }
-      if (container.innerHTML === "") {
-        container.innerHTML = "<p>No tienes NFTs aún.</p>";
       }
     }
   </script>
