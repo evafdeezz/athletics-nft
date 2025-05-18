@@ -6,88 +6,110 @@
   <title>Copa de Naciones - Inscripciones</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter&display=swap">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      background-color: #e6f7f7;
-      color: #222;
-    }
-    header {
-      background-color: #006d5b;
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
-    h1 {
-      margin: 0.2rem;
-    }
-    .section {
-      padding: 2rem;
-      background-color: white;
-      margin: 1rem auto;
-      max-width: 900px;
-      border-radius: 12px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-    select, input, button {
-      display: block;
-      margin: 1rem 0;
-      padding: 0.8rem;
-      width: 100%;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #00795f;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-    }
-    button:hover:not(:disabled) {
-      background-color: #005c47;
-    }
-    button:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
-    }
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 1rem;
-      background-color: #fafafa;
-      box-shadow: 0 0 5px rgba(0,0,0,0.05);
-    }
-    .card img {
-      width: 100%;
-      border-radius: 8px;
-    }
-    .card h3 {
-      margin: 0.5rem 0 0.2rem;
-      font-size: 1.1rem;
-    }
-  </style>
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background-color: #d2e7f5;
+    color: #222;
+  }
+
+  header {
+    background-color: #6db5ea;
+    color: white;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 0.2rem;
+  }
+
+  .section {
+    padding: 2rem;
+    background-color: white;
+    margin: 1rem auto;
+    max-width: 900px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  }
+
+  select, input {
+    display: block;
+    margin: 1rem 0;
+    padding: 0.8rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+
+  button {
+    display: block;
+    margin: 1rem 0;
+    padding: 0.8rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    border-radius: 6px;
+    background-color: #6db5ea;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+  }
+
+  button:hover:not(:disabled) {
+    background-color: #d2e7f5; /* azul más oscuro */
+  }
+
+  button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1rem;
+    background-color: #fafafa;
+    box-shadow: 0 0 5px rgba(0,0,0,0.05);
+  }
+
+  .card img {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .card h3 {
+    margin: 0.5rem 0 0.2rem;
+    font-size: 1.1rem;
+  }
+</style>
+
 </head>
 <body>
   <header>
-    <h1>Copa de Naciones - 27 de junio 2024</h1>
+    <h1>🏆 Copa de Naciones - 27 de junio 2025</h1>
     <p>Inscripciones oficiales en pruebas de atletismo mediante NFTs</p>
   </header>
 
   <section class="section">
-    <h2>1. Conecta tu Wallet</h2>
+    <h2>🔗 Conecta tu Wallet</h2>
     <p><strong>Dirección:</strong> <span id="wallet">(no conectado)</span></p>
     <button onclick="connectWallet()">Conectar con MetaMask</button>
   </section>
 
   <section class="section">
-    <h2>2. Selecciona tu perfil</h2>
+    <h2>👤 Selecciona tu perfil</h2>
     <select id="sexo">
       <option value="0">Masculino</option>
       <option value="1">Femenino</option>
@@ -97,20 +119,23 @@
   </section>
 
   <section class="section">
-    <h2>3. Competiciones disponibles</h2>
+    <h2>🏁 Competiciones disponibles</h2>
     <div id="competiciones" class="card-grid"></div>
   </section>
 
   <section class="section">
-    <h2>Inscripciones NFT en la Copa de Naciones</h2>
+    <h2>✅ Inscripciones NFT en la Copa de Naciones</h2>
     <div id="nfts" class="card-grid" id="tokensContainer"></div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
   <script>
     const contractAddress = "0xEa806E56bedBEe07bB8b2b991a21191F44a9005D";
-    const ipfsGateway = "https://gateway.pinata.cloud/ipfs/";
-    const ipfsCID = "bafybeiciumeoqtlkkhnujm75aecoerwxashsdgkp6aug234dyd4753d6ie";
+    //const ipfsGateway = "https://gateway.pinata.cloud/ipfs/";
+    const ipfsGateway = "https://ipfs.io/ipfs/";
+    //const ipfsCID = "bafybeiciumeoqtlkkhnujm75aecoerwxashsdgkp6aug234dyd4753d6ie";
+    const ipfsCID = "bafybeif245tnc6t2glmet6lulwqcavocl2rm4466yg5prv3pfifj7t34xq";
+
 
     const abi = [
       {"inputs": [{"internalType": "address", "name": "to", "type": "address"}, {"internalType": "uint256", "name": "id", "type": "uint256"}], "name": "mintEntry", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
@@ -119,17 +144,17 @@
     ];
 
     const pruebas = [
-      { id: 10400, nombre: "100m Masculino Absoluto" },
       { id: 10100, nombre: "Altura Masculino Sub18" },
-      { id: 20200, nombre: "Longitud Masculino Sub20" },
-      { id: 40300, nombre: "Martillo Masculino Sub23" },
-      { id: 50400, nombre: "Relevos Masculino Absoluto" },
-      { id: 60300, nombre: "Vallas Masculino Sub23" },
-      { id: 20701, nombre: "Altura Femenino Sub20" },
+      { id: 10400, nombre: "100m Masculino Absoluto" },
       { id: 10801, nombre: "Disco Femenino Sub18" },
+      { id: 20200, nombre: "Longitud Masculino Sub20" },
+      { id: 20701, nombre: "Altura Femenino Sub20" },
       { id: 30901, nombre: "Jabalina Femenino Sub23" },
+      { id: 40300, nombre: "Martillo Masculino Sub23" },
       { id: 41001, nombre: "Marcha Femenino Absoluto" },
+      { id: 50400, nombre: "Relevos Masculino Absoluto" },
       { id: 51101, nombre: "Obstáculos Femenino Absoluto" },
+      { id: 60300, nombre: "Vallas Masculino Sub23" },
       { id: 61201, nombre: "Triple Femenino Sub20" }
     ];
 
@@ -169,29 +194,55 @@
       container.innerHTML = "";
 
       for (const prueba of pruebas) {
-        if (prueba.id % 10 !== sexo) continue;
-        const idCategoria = Math.floor((prueba.id % 10000) / 100);
-        if (cat > idCategoria) continue;
+        // Filtro por sexo y categoría
+        //if (prueba.id % 10 !== sexo) continue;
+        //const idCategoria = Math.floor((prueba.id % 10000) / 100);
+        //if (cat > idCategoria) continue;
 
-        const balance = await contract.methods.balanceOf(user, prueba.id).call();
-        const inscrito = parseInt(balance) > 0;
+        try {
+          const uri = ${ipfsGateway}${ipfsCID}/${prueba.id}.json;
+          const res = await fetch(uri);
+          const meta = await res.json();
+          const sexoAttr = meta.attributes.find(a => a.trait_type === "Sexo")?.value;
+          const categoriaAttr = meta.attributes.find(a => a.trait_type === "Categoría")?.value;
 
-        const uri = `${ipfsGateway}${ipfsCID}/${prueba.id}.json`;
-        const res = await fetch(uri);
-        const meta = await res.json();
-        const imagen = meta.image.replace("ipfs://", ipfsGateway);
+          if (!sexoAttr || !categoriaAttr) continue;
 
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${imagen}" alt="${meta.name}" />
-          <h3>${meta.name}</h3>
-          <p>${meta.description}</p>
-          <button ${inscrito ? "disabled" : "onclick=\"inscribirse(" + prueba.id + ")\""}>
-            ${inscrito ? "Ya inscrito" : "Inscribirme"}
-          </button>
-        `;
-        container.appendChild(card);
+          const sexoMeta = sexoAttr === "Masculino" ? 0 : 1;
+          const categoriaMap = { "Sub18": 1, "Sub20": 2, "Sub23": 3, "Absoluto": 4 };
+          const categoriaMeta = categoriaMap[categoriaAttr] || 0;
+
+          if (sexo !== sexoMeta || cat > categoriaMeta) continue;
+            const imagen = meta.image.startsWith("ipfs://")
+              ? meta.image.replace("ipfs://", "https://ipfs.io/ipfs/")
+              : meta.image;
+
+          const balance = await contract.methods.balanceOf(user, prueba.id).call();
+          const inscrito = parseInt(balance) > 0;
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img src="${imagen}" alt="${meta.name}" />
+            <h3>${meta.name}</h3>
+            <p>${meta.description}</p>
+            <button ${inscrito ? "disabled" : ""} data-id="${prueba.id}">
+              ${inscrito ? "Ya inscrito" : "Inscribirme"}
+            </button>
+          `;
+          if (!inscrito) {
+            const btn = card.querySelector("button");
+            btn.addEventListener("click", () => inscribirse(prueba.id));
+          }
+
+          container.appendChild(card);
+        } catch (err) {
+          console.warn("Error al cargar prueba:", prueba.id, err);
+        }
+      }
+
+      if (container.innerHTML === "") {
+        container.innerHTML = "<p>No hay competiciones disponibles según tu perfil.</p>";
       }
     }
 
@@ -202,13 +253,15 @@
       loadUserTokens();
     }
 
+    window.inscribirse = inscribirse;
+
     async function loadUserTokens() {
       const container = document.getElementById("nfts");
       container.innerHTML = "";
       for (const prueba of pruebas) {
         const balance = await contract.methods.balanceOf(user, prueba.id).call();
         if (parseInt(balance) > 0) {
-          const uri = `${ipfsGateway}${ipfsCID}/${prueba.id}.json`;
+          const uri = ${ipfsGateway}${ipfsCID}/${prueba.id}.json;
           try {
             const res = await fetch(uri);
             const data = await res.json();
@@ -224,7 +277,7 @@
             `;
             container.appendChild(card);
           } catch (err) {
-            console.error(`Error al cargar metadata del token ${prueba.id}:`, err);
+            console.error(Error al cargar metadata del token ${prueba.id}:, err);
           }
         }
       }
@@ -232,6 +285,9 @@
         container.innerHTML = "<p>No tienes NFTs aún.</p>";
       }
     }
+
+    window.loadUserTokens = loadUserTokens;
+
   </script>
 </body>
 </html>
