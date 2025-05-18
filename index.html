@@ -103,12 +103,12 @@
 
   <section class="section">
     <h2>Inscripciones NFT en la Copa de Naciones</h2>
-    <div id="nfts" class="card-grid"></div>
+    <div id="nfts" class="card-grid" id="tokensContainer"></div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
   <script>
-    const contractAddress = "0x8b26094ceB2C45EE4B95205246A65b4A96DF36a7";
+    const contractAddress = "0xEa806E56bedBEe07bB8b2b991a21191F44a9005D";
     const ipfsGateway = "https://gateway.pinata.cloud/ipfs/";
     const ipfsCID = "bafybeiciumeoqtlkkhnujm75aecoerwxashsdgkp6aug234dyd4753d6ie";
 
@@ -145,7 +145,7 @@
         user = accounts[0];
         document.getElementById("wallet").innerText = user;
         contract = new web3.eth.Contract(abi, contractAddress);
-        mostrarTusNFTs();
+        loadUserTokens();
       } else {
         alert("Por favor instala MetaMask.");
       }
@@ -176,7 +176,7 @@
         const balance = await contract.methods.balanceOf(user, prueba.id).call();
         const inscrito = parseInt(balance) > 0;
 
-        const uri = `https://gateway.pinata.cloud/ipfs/${ipfsCID}/${prueba.id}.json`;
+        const uri = `${ipfsGateway}${ipfsCID}/${prueba.id}.json`;
         const res = await fetch(uri);
         const meta = await res.json();
         const imagen = meta.image.replace("ipfs://", ipfsGateway);
@@ -199,30 +199,37 @@
       await contract.methods.mintEntry(user, id).send({ from: user });
       alert("¡Inscripción completada!");
       mostrarCompeticiones();
-      mostrarTusNFTs();
+      loadUserTokens();
     }
 
-    async function mostrarTusNFTs() {
+    async function loadUserTokens() {
       const container = document.getElementById("nfts");
       container.innerHTML = "";
       for (const prueba of pruebas) {
         const balance = await contract.methods.balanceOf(user, prueba.id).call();
         if (parseInt(balance) > 0) {
-          const uri = `https://gateway.pinata.cloud/ipfs/${ipfsCID}/${prueba.id}.json`;
-          const res = await fetch(uri);
-          const meta = await res.json();
-          const imagen = meta.image.replace("ipfs://", ipfsGateway);
+          const uri = `${ipfsGateway}${ipfsCID}/${prueba.id}.json`;
+          try {
+            const res = await fetch(uri);
+            const data = await res.json();
+            const imgUrl = data.image.startsWith("ipfs://") ? data.image.replace("ipfs://", ipfsGateway) : data.image;
 
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <img src="${imagen}" alt="${meta.name}" />
-            <h3>${meta.name}</h3>
-            <p>${meta.description}</p>
-            <p><strong>Cantidad:</strong> ${balance}</p>
-          `;
-          container.appendChild(card);
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <img src="${imgUrl}" alt="${data.name}" />
+              <h3>${data.name}</h3>
+              <p>${data.description}</p>
+              <p><strong>Cantidad:</strong> ${balance}</p>
+            `;
+            container.appendChild(card);
+          } catch (err) {
+            console.error(`Error al cargar metadata del token ${prueba.id}:`, err);
+          }
         }
+      }
+      if (container.innerHTML === "") {
+        container.innerHTML = "<p>No tienes NFTs aún.</p>";
       }
     }
   </script>
