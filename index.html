@@ -6,95 +6,94 @@
   <title>Copa de Naciones - Inscripciones</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter&display=swap">
   <style>
-  body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    background-color: #d2e7f5;
-    color: #222;
-  }
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #d2e7f5;
+      color: #222;
+    }
 
-  header {
-    background-color: #6db5ea;
-    color: white;
-    padding: 2rem;
-    text-align: center;
-  }
+    header {
+      background-color: #6db5ea;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
 
-  h1 {
-    margin: 0.2rem;
-  }
+    h1 {
+      margin: 0.2rem;
+    }
 
-  .section {
-    padding: 2rem;
-    background-color: white;
-    margin: 1rem auto;
-    max-width: 900px;
-    border-radius: 12px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-  }
+    .section {
+      padding: 2rem;
+      background-color: white;
+      margin: 1rem auto;
+      max-width: 900px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
 
-  select, input {
-    display: block;
-    margin: 1rem 0;
-    padding: 0.8rem;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-  }
+    select, input {
+      display: block;
+      margin: 1rem 0;
+      padding: 0.8rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
 
-  button {
-    display: block;
-    margin: 1rem 0;
-    padding: 0.8rem;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    border-radius: 6px;
-    background-color: #6db5ea;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    font-size: 1rem;
-  }
+    button {
+      display: block;
+      margin: 1rem 0;
+      padding: 0.8rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      border-radius: 6px;
+      background-color: #6db5ea;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
 
-  button:hover:not(:disabled) {
-    background-color: #d2e7f5; /* azul más oscuro */
-  }
+    button:hover:not(:disabled) {
+      background-color: #d2e7f5;
+    }
 
-  button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
-  }
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
 
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-  }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
 
-  .card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 1rem;
-    background-color: #fafafa;
-    box-shadow: 0 0 5px rgba(0,0,0,0.05);
-  }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 1rem;
+      background-color: #fafafa;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
 
-  .card img {
-    width: 100%;
-    border-radius: 8px;
-  }
+    .card img {
+      width: 100%;
+      border-radius: 8px;
+    }
 
-  .card h3 {
-    margin: 0.5rem 0 0.2rem;
-    font-size: 1.1rem;
-  }
-</style>
-
+    .card h3 {
+      margin: 0.5rem 0 0.2rem;
+      font-size: 1.1rem;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -125,22 +124,19 @@
 
   <section class="section">
     <h2>✅ Inscripciones NFT en la Copa de Naciones</h2>
-    <div id="nfts" class="card-grid" id="tokensContainer"></div>
+    <div id="nfts" class="card-grid"></div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
   <script>
     const contractAddress = "0xEa806E56bedBEe07bB8b2b991a21191F44a9005D";
-    //const ipfsGateway = "https://gateway.pinata.cloud/ipfs/";
     const ipfsGateway = "https://ipfs.io/ipfs/";
-    //const ipfsCID = "bafybeiciumeoqtlkkhnujm75aecoerwxashsdgkp6aug234dyd4753d6ie";
     const ipfsCID = "bafybeif245tnc6t2glmet6lulwqcavocl2rm4466yg5prv3pfifj7t34xq";
 
-
     const abi = [
-      {"inputs": [{"internalType": "address", "name": "to", "type": "address"}, {"internalType": "uint256", "name": "id", "type": "uint256"}], "name": "mintEntry", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
-      {"inputs": [{"internalType": "address", "name": "account", "type": "address"}, {"internalType": "uint256", "name": "id", "type": "uint256"}], "name": "balanceOf", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
-      {"inputs": [{"internalType": "uint256", "name": "id", "type": "uint256"}], "name": "uri", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"}
+      { "inputs": [{ "internalType": "address", "name": "to", "type": "address" }, { "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "mintEntry", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+      { "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "balanceOf", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+      { "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "uri", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" }
     ];
 
     const pruebas = [
@@ -194,15 +190,11 @@
       container.innerHTML = "";
 
       for (const prueba of pruebas) {
-        // Filtro por sexo y categoría
-        //if (prueba.id % 10 !== sexo) continue;
-        //const idCategoria = Math.floor((prueba.id % 10000) / 100);
-        //if (cat > idCategoria) continue;
-
         try {
-          const uri = ${ipfsGateway}${ipfsCID}/${prueba.id}.json;
+          const uri = `${ipfsGateway}${ipfsCID}/${prueba.id}.json`;
           const res = await fetch(uri);
           const meta = await res.json();
+
           const sexoAttr = meta.attributes.find(a => a.trait_type === "Sexo")?.value;
           const categoriaAttr = meta.attributes.find(a => a.trait_type === "Categoría")?.value;
 
@@ -213,10 +205,8 @@
           const categoriaMeta = categoriaMap[categoriaAttr] || 0;
 
           if (sexo !== sexoMeta || cat > categoriaMeta) continue;
-            const imagen = meta.image.startsWith("ipfs://")
-              ? meta.image.replace("ipfs://", "https://ipfs.io/ipfs/")
-              : meta.image;
 
+          const imagen = meta.image.startsWith("ipfs://") ? meta.image.replace("ipfs://", ipfsGateway) : meta.image;
           const balance = await contract.methods.balanceOf(user, prueba.id).call();
           const inscrito = parseInt(balance) > 0;
 
@@ -261,7 +251,7 @@
       for (const prueba of pruebas) {
         const balance = await contract.methods.balanceOf(user, prueba.id).call();
         if (parseInt(balance) > 0) {
-          const uri = ${ipfsGateway}${ipfsCID}/${prueba.id}.json;
+          const uri = `${ipfsGateway}${ipfsCID}/${prueba.id}.json`;
           try {
             const res = await fetch(uri);
             const data = await res.json();
@@ -277,7 +267,7 @@
             `;
             container.appendChild(card);
           } catch (err) {
-            console.error(Error al cargar metadata del token ${prueba.id}:, err);
+            console.error(`Error al cargar metadata del token ${prueba.id}:`, err);
           }
         }
       }
@@ -287,7 +277,6 @@
     }
 
     window.loadUserTokens = loadUserTokens;
-
   </script>
 </body>
 </html>
