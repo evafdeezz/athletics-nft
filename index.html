@@ -109,12 +109,12 @@
 
   <section class="section">
     <h2>👤 Selecciona tu perfil</h2>
-    <select id="sexo">
+    <select id="sexo" disabled>
       <option value="0">Masculino</option>
       <option value="1">Femenino</option>
     </select>
-    <input type="number" id="edad" placeholder="Edad (mínimo 16 años)" min="16" />
-    <button onclick="mostrarCompeticiones()">Mostrar competiciones disponibles</button>
+    <input type="number" id="edad" placeholder="Edad (mínimo 16 años)" min="16" disabled />
+    <button id="btnMostrar" onclick="mostrarCompeticiones()" disabled>Mostrar competiciones disponibles</button>
   </section>
 
   <section class="section">
@@ -166,6 +166,9 @@
         user = accounts[0];
         document.getElementById("wallet").innerText = user;
         contract = new web3.eth.Contract(abi, contractAddress);
+        document.getElementById("sexo").disabled = false;
+        document.getElementById("edad").disabled = false;
+        document.getElementById("btnMostrar").disabled = false;
         loadUserTokens();
       } else {
         alert("Por favor instala MetaMask.");
@@ -181,6 +184,11 @@
     }
 
     async function mostrarCompeticiones() {
+      if (!user || !contract) {
+        alert("Debes conectar MetaMask primero.");
+        return;
+      }
+
       const sexo = parseInt(document.getElementById("sexo").value);
       const edad = parseInt(document.getElementById("edad").value);
       const cat = getCategoria(edad);
@@ -198,8 +206,6 @@
           const sexoAttr = meta.attributes.find(a => a.trait_type === "Sexo")?.value;
           const categoriaAttr = meta.attributes.find(a => a.trait_type === "Categoría")?.value;
 
-          if (!sexoAttr || !categoriaAttr) continue;
-
           const sexoMeta = sexoAttr === "Masculino" ? 0 : 1;
           const categoriaMap = { "Sub18": 1, "Sub20": 2, "Sub23": 3, "Absoluto": 4 };
           const categoriaMeta = categoriaMap[categoriaAttr] || 0;
@@ -207,8 +213,14 @@
           if (sexo !== sexoMeta || cat > categoriaMeta) continue;
 
           const imagen = meta.image.startsWith("ipfs://") ? meta.image.replace("ipfs://", ipfsGateway) : meta.image;
-          const balance = await contract.methods.balanceOf(user, prueba.id).call();
-          const inscrito = parseInt(balance) > 0;
+
+          let inscrito = false;
+          try {
+            const balance = await contract.methods.balanceOf(user, prueba.id).call();
+            inscrito = parseInt(balance) > 0;
+          } catch (err) {
+            console.warn("No se pudo comprobar balance de", prueba.id);
+          }
 
           const card = document.createElement("div");
           card.className = "card";
@@ -220,6 +232,7 @@
               ${inscrito ? "Ya inscrito" : "Inscribirme"}
             </button>
           `;
+
           if (!inscrito) {
             const btn = card.querySelector("button");
             btn.addEventListener("click", () => inscribirse(prueba.id));
@@ -243,16 +256,14 @@
       loadUserTokens();
     }
 
-    window.inscribirse = inscribirse;
-
     async function loadUserTokens() {
       const container = document.getElementById("nfts");
       container.innerHTML = "";
       for (const prueba of pruebas) {
-        const balance = await contract.methods.balanceOf(user, prueba.id).call();
-        if (parseInt(balance) > 0) {
-          const uri = `${ipfsGateway}${ipfsCID}/${prueba.id}.json`;
-          try {
+        try {
+          const balance = await contract.methods.balanceOf(user, prueba.id).call();
+          if (parseInt(balance) > 0) {
+            const uri = `${ipfsGateway}${ipfsCID}/${prueba.id}.json`;
             const res = await fetch(uri);
             const data = await res.json();
             const imgUrl = data.image.startsWith("ipfs://") ? data.image.replace("ipfs://", ipfsGateway) : data.image;
@@ -266,17 +277,20 @@
               <p><strong>Cantidad:</strong> ${balance}</p>
             `;
             container.appendChild(card);
-          } catch (err) {
-            console.error(`Error al cargar metadata del token ${prueba.id}:`, err);
           }
+        } catch (err) {
+          console.error(`Error al cargar metadata del token ${prueba.id}:`, err);
         }
       }
+
       if (container.innerHTML === "") {
         container.innerHTML = "<p>No tienes NFTs aún.</p>";
       }
     }
 
-    window.loadUserTokens = loadUserTokens;
+    window.connectWallet = connectWallet;
+    window.mostrarCompeticiones = mostrarCompeticiones;
+    window.inscribirse = inscribirse;
   </script>
 </body>
 </html>
